@@ -7,6 +7,7 @@ This command set has 4 custom commands:
 	-wordlist2: An extension of the first command to finish the database
 	-wordy: The command to start a new puzzle
 	-guess: The command to make a guess at the puzzle
+	-addword: add a word to the dictionary
 
 Puzzles are uniquely assigned to users, so no one else can guess at someone else's puzzle.
 
