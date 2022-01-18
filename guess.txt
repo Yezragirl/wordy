@@ -110,7 +110,7 @@
 {{$check}}
 {{if not (reFind $guessValidation $validation)}}
 					{{if ge $attempt 6}}
-						{{$nope := (joinStr "" "**Sorry, " .User.Mention ".** That's all your guesses...\nThe correct answer was `" $validation "`. Better luck next time!")}}
+						{{$nope := (joinStr "" "**Sorry, " .User.Mention ".** That's all your guesses...\nThe correct answer was `" (upper $validation) "`. Better luck next time!")}}
 							{{if ne $evil 0}}{{$nope = (joinStr "" "**Sorry, " .User.Mention ".** That's all your guesses... Better luck next time!")}}{{end}}
 						{{sendMessage nil $nope}}
 						{{dbDel .User.ID "WLGUESS"}}
