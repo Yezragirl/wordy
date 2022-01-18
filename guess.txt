@@ -72,7 +72,7 @@
 							{{else}}
 						{{range $word}}
 							{{if inFold . $g3}}
-								{{$o1 = lower $g3}}
+								{{$o3 = lower $g3}}
 							{{end}}
 						{{end}}
 					{{end}}
@@ -81,7 +81,7 @@
 							{{else}}
 						{{range $word}}
 							{{if inFold . $g4}}
-								{{$o1 = lower $g4}}
+								{{$o4 = lower $g4}}
 							{{end}}
 						{{end}}
 					{{end}}
