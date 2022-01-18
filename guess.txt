@@ -96,7 +96,7 @@
 					{{end}}
 
 				{{$check := joinStr " " $o1 $o2 $o3 $o4 $o5}}
-				{{$check = joinStr "" "[" $check "] on attempt `" $attempt "`"}}
+				{{$check = joinStr "" "[" $check "] on attempt `" $attempt "` (" ($args.Get 0) ")"}}
 				{{$previous := dbGet .User.ID "WLPREVIOUS"}}
 				{{$check2 := joinStr "" "(?i)" $g1 $g2 $g3 $g4 $g5}}
 					{{if $previous.Value}}
