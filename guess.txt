@@ -104,10 +104,17 @@
 {{.User.Mention}}
 {{$previous}}
 {{$check}}
-				{{if not (reFind $guessValidation $validation)}}
-					{{$next := joinStr "\n" $previous $check}}
-					{{dbSet .User.ID "WLGUESS" $add}}
-					{{dbSet .User.ID "WLPREVIOUS" $next}}
+{{if not (reFind $guessValidation $validation)}}
+					{{if ge $attempt 6}}
+						{{sendMessage nil (joinStr "" "**Sorry, " .User.Mention ".** That's all your guesses... Better luck next time!")}}
+						{{dbDel .User.ID "WLGUESS"}}
+						{{dbDel .User.ID "WLWORD"}}
+						{{dbDel .User.ID "WLPREVIOUS"}}
+							{{else}}
+						{{$next := joinStr "\n" $previous $check}}
+						{{dbSet .User.ID "WLGUESS" $add}}
+						{{dbSet .User.ID "WLPREVIOUS" $next}}
+					{{end}}
 						{{else}}
 					{{$left := sub 6 $attempt}}
 					{{sendMessage nil (joinStr "" "**Congratulations, " .User.Mention "!** You solved it with `" $left "` guesses left.")}}
