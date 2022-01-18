@@ -7,6 +7,10 @@
 	Author: AaroneousAK <https://github.com/AaroneousAK/>
 */}}
 
+{{/* Configuration values */}}
+{{$evil := 0}}{{/* <== Change this if you DO NOT want the answer revealed on an unsuccessful attempt */}}
+{{/* End of configuration values */}}
+
 {{$args := parseArgs 1 "Requires a 5-letter word"
  (carg "string" "word")}}
 {{$guess := $args.Get 0}}
@@ -106,7 +110,9 @@
 {{$check}}
 {{if not (reFind $guessValidation $validation)}}
 					{{if ge $attempt 6}}
-						{{sendMessage nil (joinStr "" "**Sorry, " .User.Mention ".** That's all your guesses... Better luck next time!")}}
+						{{$nope := (joinStr "" "**Sorry, " .User.Mention ".** That's all your guesses...\nThe correct answer was `" $validation "`. Better luck next time!")}}
+							{{if ne $evil 0}}{{$nope = (joinStr "" "**Sorry, " .User.Mention ".** That's all your guesses... Better luck next time!")}}{{end}}
+						{{sendMessage nil $nope}}
 						{{dbDel .User.ID "WLGUESS"}}
 						{{dbDel .User.ID "WLWORD"}}
 						{{dbDel .User.ID "WLPREVIOUS"}}
