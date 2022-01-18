@@ -1,0 +1,7 @@
+{{$add := .StrippedMsg}}
+{{$get := dbGet 0 "WORDLIST"}}
+{{$new := joinStr " " $get.Value $add}}
+{{dbSet 0 "WORDLIST" $new}}
+Added {{$add}}
+{{deleteResponse 5}}
+{{deleteTrigger 5}}
