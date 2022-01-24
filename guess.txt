@@ -65,7 +65,7 @@
 			{{$game.Set "embed" $msg}}{{dbSet .User.ID "WORDY" $game}}
 		{{else}}
 			
-{{/* B. VARIABLES */}}
+{{/* B. VARIABLES */}} 
 {{$w1 := slice $word 0 1}}{{$w2 := slice $word 1 2}}{{$w3 := slice $word 2 3}}{{$w4 := slice $word 3 4}}{{$w5 := slice $word 4}}{{$word2 := cslice $w1 $w2 $w3 $w4 $w5}}
 {{$g1 := slice $guess 0 1}}{{$g2 := slice $guess 1 2}}{{$g3 := slice $guess 2 3}}{{$g4 := slice $guess 3 4}}{{$g5 := slice $guess 4}}{{$guess2 := cslice $g1 $g2 $g3 $g4 $g5}}
 {{$guessCheck := ""}}
