@@ -1,19 +1,18 @@
-
 {{/*
 	Starts a new wordy (wordle clone)
-
+ 
 	See <link>
-
+ 
 	Author: AaroneousAK <https://github.com/AaroneousAK/>
 */}}
-
+ 
 {{$key := "WLWORD"}}
 {{$list := dbGet 0 "WORDLIST"}}
 {{$list = split $list.Value " "}}
 {{$list = shuffle $list}}
 {{$word := ""}}
 {{$game := (dbGet .User.ID "WORDY").Value}}
-
+ 
     {{if $game}}
         {{$msg := $game.Get "embed"}}
         {{$attempt := $game.Get "guess"}}
@@ -46,6 +45,7 @@
         {{end}}
     {{else}}
         {{$word = index $list 0}}
+	{{dbSet .User.ID "WORDYUSED" (sdict "A" "" "B" "" "C" "" "D" "" "E" "" "F" "" "G" "" "H" "" "I" "" "J" "" "K" "" "L" "" "M" "" "N" "" "O" "" "P" "" "Q" "" "R" "" "S" "" "T" "" "U" "" "V" "" "W" "" "X" "" "Y" "" "Z" "" )}}
         {{$expire:= toInt (currentTime.Add (toDuration (mult 30 .TimeMinute))).Unix}}
         {{$embed := cembed 
         "title" "Wordy" 
@@ -60,5 +60,5 @@
         {{$game = sdict "word" $word "guess" 0 "previous" "" "embed" (toString $msg) "expires" $expire }}
         {{dbSetExpire .User.ID "WORDY" $game 1800}}
     {{end}}
-
+ 
 {{deleteTrigger 5}}
