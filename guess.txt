@@ -47,7 +47,7 @@
 			"thumbnail" (sdict "url" "http://www.yezsarkcluster.com/uploads/7/1/0/3/7103082/wordy.jpg") }}
 			{{deleteMessage nil $msg 10}}{{$msg = sendMessageRetID nil (complexMessage "content" .User.Mention "embed" $embed)}}
 			{{$game.Set "embed" $msg}}{{dbSet .User.ID "WORDY" $game}}
-		{{else if eq $v 0}}That might be a word, but it's not a word this game knows. Try again.
+		{{else if eq $v 0}}
 			{{$errormsg := "Sorry, that might be a word, but it's not a word this game knows. Please try again.\n(If you think this should be added to the word list, please tag @admin and let them know.)"}}
 			{{/* Red */}}
 			{{$embed := cembed 
