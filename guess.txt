@@ -1,16 +1,15 @@
 {{/*
 	Makes a guess at the current word
-
+ 
 	See <link>
-
+ 
 	Author: AaroneousAK <https://github.com/AaroneousAK/>
 */}}
-
-{{/* Configuration values */}}
-{{$evil := 0}}{{/* <== Change this if you DO NOT want the answer revealed on an unsuccessful attempt */}}
-{{/* End of configuration values */}}
-
-{{/* Set Variables */}}
+ 
+{{/* Config values */}}
+{{$evil := 0}}{{/* <== 0 shows answer on fail */}}
+ 
+{{/* VARIABLES */}}
 {{$game := (dbGet .User.ID "WORDY").Value}}
 {{$args := parseArgs 1 "Requires a 5-letter word"
 (carg "string" "word")}}
@@ -24,14 +23,15 @@
 {{$list = split $list " "}}
 {{$guessValidation := lower $guess}}
 {{$o1 := "~"}}{{$o2 := "~"}}{{$o3 := "~"}}{{$o4 := "~"}}{{$o5 := "~"}}
-
-{{/* End of Variables */}}
-
+{{$newUsed := (dbGet .User.ID "WORDYUSED").Value}}
+{{$used := ""}}
+{{range $newUsed}}{{$used = joinStr "" $used (lower .)}}{{end}}
+{{$used = joinStr "" "`" $used "`"}}
+ 
 {{if $game}}
 	{{if ge (toInt $expire) currentTime.Unix}}
 		{{$v := 0}}
 			{{range $list}}{{- if eq . $guessValidation}}{{$v = 1}}{{end -}}{{end -}}
-
 		{{if not (eq (len $guess) 5)}}
 			{{$errormsg := "Please enter a 5-letter word."}}
 			{{/* Red */}}
@@ -56,6 +56,7 @@
 			"color" 16711680
 			"fields" (cslice
 			(sdict "name" "Progress" "value" $previous "inline" false)
+			(sdict "name" "Letters Used" "value" $used "inline" false)
 			(sdict "name" "Attempts Remaining" "value" (toString (sub 6 $attempt)) "inline" false)
 			(sdict "name" "Expires" "value" (joinStr "" "This game expires <t:" $expire ":R>") "inline" false))
 			"footer" (sdict "text" (joinStr "" "This game belongs to: " .User.String) )
@@ -63,7 +64,8 @@
 			{{deleteMessage nil $msg 10}}{{$msg = sendMessageRetID nil (complexMessage "content" .User.Mention "embed" $embed)}}
 			{{$game.Set "embed" $msg}}{{dbSet .User.ID "WORDY" $game}}
 		{{else}}
-			{{/* BUILDING VARIABLES */}}
+			
+{{/* B. VARIABLES */}}
 {{$w1 := slice $word 0 1}}{{$w2 := slice $word 1 2}}{{$w3 := slice $word 2 3}}{{$w4 := slice $word 3 4}}{{$w5 := slice $word 4}}{{$word2 := cslice $w1 $w2 $w3 $w4 $w5}}
 {{$g1 := slice $guess 0 1}}{{$g2 := slice $guess 1 2}}{{$g3 := slice $guess 2 3}}{{$g4 := slice $guess 3 4}}{{$g5 := slice $guess 4}}{{$guess2 := cslice $g1 $g2 $g3 $g4 $g5}}
 {{$guessCheck := ""}}
@@ -72,21 +74,26 @@
 {{$o1 := "~"}}{{$o2 := "~"}}{{$o3 := "~"}}{{$o4 := "~"}}{{$o5 := "~"}}
 {{$yes := 0}}{{$maybe := 0}}
 {{$x := ""}}{{$y := ""}}
-			{{$validation := $word}}
-			{{/* CHECKING SOLVED POSITIONS */}}
+{{$validation := $word}}
+ 
+{{range $u := $guess2}}{{$newUsed.Set $u $u}}{{end}}
+{{ dbSet .User.ID "WORDYUSED" $newUsed }}
+{{$used = ""}}
+{{range $newUsed}}{{$used = joinStr "" $used (lower .)}}{{end}}
+{{$used = joinStr "" "`" $used "`"}}
+ 
+		{{/* CHECKING SOLVED POSITIONS */}}
 		{{- if eq $g1 $w1}}{{$o1 = upper $g1}}{{$g1 = "!"}}{{end -}}
 		{{- if eq $g2 $w2}}{{$o2 = upper $g2}}{{$g2 = "!"}}{{end -}}
 		{{- if eq $g3 $w3}}{{$o3 = upper $g3}}{{$g3 = "!"}}{{end -}}
 		{{- if eq $g4 $w4}}{{$o4 = upper $g4}}{{$g4 = "!"}}{{end -}}
 		{{- if eq $g5 $w5}}{{$o5 = upper $g5}}{{$g5 = "!"}}{{end -}}
-		{{/* CHECKING SOLVED POSITIONS */}}
 		
-		{{/* REBUILDING CHECKS */}}
+		{{/* RB. CHECKS */}}
 		{{$wordCheck = joinStr "" $o1 $o2 $o3 $o4 $o5}}
 		{{$word2 = cslice $o1 $o2 $o3 $o4 $o5}}
 		{{$guessCheck = joinStr "" $g1 $g2 $g3 $g4 $g5}}
 		{{$guess2 = cslice $g1 $g2 $g3 $g4 $g5}}
-		{{/* REBUILDING CHECKS */}}
 		
 		{{/* CHECKING FOR MAYBE LETTERS */}}
 		{{- range $index1, $element1 := $guess2}}{{- if ne $element1 "!"}}
@@ -105,7 +112,6 @@
 		{{$x = len $x}}
 		{{$y = reFindAll $elementCheck $wordCheck}}
 		{{$y = len $y}}
-		{{/* VALIDATING UNSOLVED LETTERS */}}
 		
 		{{/* PLACING MAYBE LETTERS */}}
 		{{- if gt $x $y}}
@@ -121,10 +127,8 @@
 		{{end -}}
 		{{$wordCheck = joinStr "" $o1 $o2 $o3 $o4 $o5}}
 		{{$word2 = cslice $o1 $o2 $o3 $o4 $o5}}
-		{{/* PLACING MAYBE LETTERS */}}
 		
 		{{end -}}
-		{{/* CHECKING FOR MAYBE LETTERS */}}
 		
 		{{end -}}
 		
@@ -134,7 +138,7 @@
 		{{- if eq $o3 $w3}}{{$o3 = joinStr "" "**" $o3 "**"}}{{end -}}
 		{{- if eq $o4 $w4}}{{$o4 = joinStr "" "**" $o4 "**"}}{{end -}}
 		{{- if eq $o5 $w5}}{{$o5 = joinStr "" "**" $o5 "**"}}{{end -}}
-		{{/* FORMATTING SOLVED POSITIONS */}}
+ 
 		{{$add := add $attempt 1}}
 			{{$check := joinStr " " $o1 $o2 $o3 $o4 $o5}}
 			{{$check = joinStr "" "[" $check "] on attempt `" $add "` (" $guess ")"}}
@@ -175,6 +179,7 @@
 				"color" 16776960
 				"fields" (cslice
 				(sdict "name" "Progress" "value" $next "inline" false)
+				(sdict "name" "Letters Used" "value" $used "inline" false)
 				(sdict "name" "Attempts Remaining" "value" (toString (sub 6 $add)) "inline" false)
 				(sdict "name" "Expires" "value" (joinStr "" "This game expires <t:" $expire ":R>") "inline" false))
 				"footer" (sdict "text" (joinStr "" "This game belongs to: " .User.String) )
