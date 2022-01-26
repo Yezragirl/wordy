@@ -1,7 +1,18 @@
 {{$add := .StrippedMsg}}
 {{$get := dbGet 0 "WORDLIST"}}
 {{$new := joinStr " " $get.Value $add}}
+{{$logchannel := 587858995012698137}} 
 {{dbSet 0 "WORDLIST" $new}}
 Added {{$add}}
 {{deleteResponse 5}}
 {{deleteTrigger 5}}
+
+{{$embed := cembed 
+		"title" "Wordy" 
+		"description" (joinStr "" "*Word Added to Word List*\n**" .StrippedMsg "**")
+		"color" 999985
+               "footer" (sdict
+			"text" (print "Command triggered by " .User.String "."))
+               "thumbnail" (sdict "url" "http://www.yezsarkcluster.com/uploads/7/1/0/3/7103082/wordy_orig.jpg") }}
+		{{sendMessage $log $embed}}
+		{{deleteTrigger 1}}
