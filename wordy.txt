@@ -1,64 +1,59 @@
-{{/*
-	Starts a new wordy (wordle clone)
- 
-	See <link>
- 
-	Author: AaroneousAK <https://github.com/AaroneousAK/>
-*/}}
- 
-{{$key := "WLWORD"}}
 {{$list := dbGet 0 "WORDLIST"}}
 {{$list = split $list.Value " "}}
 {{$list = shuffle $list}}
 {{$word := ""}}
 {{$game := (dbGet .User.ID "WORDY").Value}}
- 
+{{$capitalletters := (sdict "A" "🇦" "B" "🇧" "C" "🇨" "D" "🇩" "E" "🇪" "F" "🇫" "G" "🇬" "H" "🇭" "I" "🇮" "J" "🇯" "K" "🇰" "L" "🇱" "M" "🇲" "N" "🇳" "O" "🇴" "P" "🇵" "Q" "🇶" "R" "🇷" "S" "🇸" "T" "🇹" "U" "🇺" "V" "🇻" "W" "🇼" "X" "🇽" "Y" "🇾" "Z" "🇿" )}}
+{{$lowerletters := (sdict "A" "<:a_:935648790227071020>" "B" "<:b_:935648790315159563>" "C" "<:c_:935648790524874812>" "D" "<:d_:935648790969454682>" "E" "<:e_:935648790097043517>" "F" "<:f_:935648790684250122>" "G" "<:g_:935648790491299960>" "H" "<:h_:935648790461956177>" "I" "<:i_:935648790529077258>" "J" "<:j_:935648790596178031>" "K" "<:k_:935648791313412166>" "L" "<:l_:935648791082725476>" "M" "<:m_:935648790554226728>" "N" "<:n_:935648790210301984>" "O" "<:o_:935648790642294792>" "P" "<:p_:935648790646521866>" "Q" "<:q_:935648790646505552>" "R" "<:r_:935648790675861544>" "S" "<:s_:935648790587801600>" "T" "<:t_:935648791040757780>" "U" "<:u_:935648790818480159>" "V" "<:v_:935648790709432371>" "W" "<:w_:935648790675861504>" "X" "<:x_:935648790185148479>" "Y" "<:y_:935648790659076146>" "Z" "<:z_:935648793678995476>" )}}
+{{dbSet 0 "CAPS" $capitalletters}}
+{{dbSet 0 "LOWS" $lowerletters}}
+{{$letters := (sdict "A" "" "B" "" "C" "" "D" "" "E" "" "F" "" "G" "" "H" "" "I" "" "J" "" "K" "" "L" "" "M" "" "N" "" "O" "" "P" "" "Q" "" "R" "" "S" "" "T" "" "U" "" "V" "" "W" "" "X" "" "Y" "" "Z" "" )}}
     {{if $game}}
         {{$msg := $game.Get "embed"}}
         {{$attempt := $game.Get "guess"}}
         {{$expire := $game.Get "expires"}}
         {{$previous := $game.Get "previous"}}
-        {{if ge (toInt $expire) currentTime.Unix}}
+        {{if le (toInt $expire) currentTime.Unix}}
             {{$errormsg := (joinStr "" "Sorry, your last Wordy game expired <t:" $expire ":R>. Use `-wordy` to start a new one!")}}
             {{$embed := cembed 
                 "title" "Wordy" 
                 "description" $errormsg
                 "color" 16711680
                 "footer" (sdict "text" (joinStr "" "This game belongs to: " .User.String) )
-                "thumbnail" (sdict "url" "http://www.yezsarkcluster.com/uploads/7/1/0/3/7103082/wordy.jpg") }}
+                "thumbnail" (sdict "url" "http://www.yezsarkcluster.com/uploads/7/1/0/3/7103082/wordy_orig.jpg") }}
                 {{$msg = sendMessageRetID nil (complexMessage "content" .User.Mention "embed" $embed)}}
             {{dbDel .User.ID "WORDY"}}
         {{else}}
             {{$errormsg := "There is already a puzzle in progress. Use `-guess <word>` to progress it."}}
-	    {{$embed := cembed 
-        	"title" "Wordy" 
-	        "description" $errormsg
-	        "color" 16711680
-	        "fields" (cslice
-	        (sdict "name" "Progress" "value" $previous "inline" false)
-	        (sdict "name" "Attempts Remaining" "value" (toString (sub 6 $attempt)) "inline" false)
-	        (sdict "name" "Expires" "value" (joinStr "" "This game expires <t:" $expire ":R>") "inline" false))
-	        "footer" (sdict "text" (joinStr "" "This game belongs to: " .User.String) )
-       		"thumbnail" (sdict "url" "http://www.yezsarkcluster.com/uploads/7/1/0/3/7103082/wordy.jpg") }}
-     	     {{$msg = sendMessageRetID nil (complexMessage "content" .User.Mention "embed" $embed)}}
-	     {{$game.Set "embed" $msg}}{{dbSet .User.ID "WORDY" $game}}
+            {{$embed := cembed 
+            "title" "Wordy" 
+            "description" $errormsg
+            "color" 16711680
+            "fields" (cslice
+            (sdict "name" "Progress" "value" $previous "inline" false)
+            (sdict "name" "Attempts Remaining" "value" (toString (sub 6 $attempt)) "inline" false)
+            (sdict "name" "Expires" "value" (joinStr "" "This game expires <t:" $expire ":R>") "inline" false))
+            "footer" (sdict "text" (joinStr "" "This game belongs to: " .User.String) )
+            "thumbnail" (sdict "url" "http://www.yezsarkcluster.com/uploads/7/1/0/3/7103082/wordy_orig.jpg") }}
+            {{$msg = sendMessageRetID nil (complexMessage "content" .User.Mention "embed" $embed)}}
+            {{$game.Set "embed" $msg}}{{dbSet .User.ID "WORDY" $game}}
         {{end}}
     {{else}}
         {{$word = index $list 0}}
-	{{dbSet .User.ID "WORDYUSED" (sdict "A" "" "B" "" "C" "" "D" "" "E" "" "F" "" "G" "" "H" "" "I" "" "J" "" "K" "" "L" "" "M" "" "N" "" "O" "" "P" "" "Q" "" "R" "" "S" "" "T" "" "U" "" "V" "" "W" "" "X" "" "Y" "" "Z" "" )}}
         {{$expire:= toInt (currentTime.Add (toDuration (mult 30 .TimeMinute))).Unix}}
         {{$embed := cembed 
         "title" "Wordy" 
         "description" "Welcome to Wordy!\n\nYour Word has been Set. You have 6 guesses and 30 minutes to solve it." 
         "color" 16711680
         "fields" (cslice 
-        (sdict "name" "Instructions" "value" "Try to figure out the 5-letter word with the command `-guess [word]`. Letters in the correct positions will be **BOLDED** and UPPERCASE in the response. Letters in the word but in the wrong position will not be bolded." "inline" false)
-(sdict "name" "Expires" "value" (joinStr "" "This game expires <t:" $expire ":R>") "inline" false))
+        (sdict "name" "Instructions" "value" "Try to figure out the 5-letter word with the command `-guess [word]`. Letters in the correct positions will be 🇧​🇱​🇺​🇪 in the response. Letters in the word but in the wrong position will be\n<:y_:935648790659076146>​<:e_:935648790097043517>​<:l_:935648791082725476>​<:l_:935648791082725476>​<:o_:935648790642294792>​<:w_:935648790675861504>." "inline" false)
+        (sdict "name" "Scoring" "value" "-500 for each unsolved letter\n1000 for each letter thats in the wrong position\n10000 for every solved letter\n\n*If you win before the last round, you get the points for 5 solved letters for each remaining round*" "inline" false)
+        (sdict "name" "Expires" "value" (joinStr "" "This game expires <t:" $expire ":R>") "inline" false))
         "footer" (sdict "text" (joinStr "" "This game belongs to: " .User.String) )
-        "thumbnail" (sdict "url" "http://www.yezsarkcluster.com/uploads/7/1/0/3/7103082/wordy.jpg") }}
+        "thumbnail" (sdict "url" "http://www.yezsarkcluster.com/uploads/7/1/0/3/7103082/wordy_orig.jpg") }}
         {{$msg := sendMessageRetID nil $embed}}
-        {{$game = sdict "word" $word "guess" 0 "previous" "" "embed" (toString $msg) "expires" $expire }}
+        {{$game = sdict "word" $word "guess" 0 "previous" "" "embed" (toString $msg) "expires" $expire "letters" $letters }}
         {{dbSetExpire .User.ID "WORDY" $game 1800}}
     {{end}}
- 
+
 {{deleteTrigger 5}}
