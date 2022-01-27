@@ -8,6 +8,8 @@ This command set has 4 custom commands:
 	-wordy: The command to start a new puzzle
 	-guess: The command to make a guess at the puzzle
 	-addword: add a word to the dictionary
+	-removeword: removes a word from the dictionary
+	-wordylb: displays a leaderboard of the top 10 Wordy players
 
 Puzzles are uniquely assigned to users, so no one else can guess at someone else's puzzle.
 
