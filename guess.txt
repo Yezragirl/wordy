@@ -200,7 +200,7 @@
 
 	{{else}}
 		{{$desc = (joinStr "" "Sorry, your last Wordy game expired <t:" $expire ":R>. Use `" $prefix "wordy` to start a new one!")}}
-		{{$error = "yes"}}
+		{{$error = "yes"}}{{$delete = "yes"}}
 		{{$color = 16711680}}{{/* Red */}}
 	{{end}}
 {{else}}
