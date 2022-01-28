@@ -15,12 +15,12 @@
 {{$lowerletters := (dbGet 0 "LOWS").Value}}
 {{$left := ""}}
 {{$msg := ""}}
+{{$eMsg := ""}}
 {{$attempt := 0}}
 {{$leftnum := 0}}
 {{$add := 0}}
 {{$delete := "no"}}
 {{$expire := ""}}
-{{$expires := ""}}
 {{$previous := ""}}
 {{$next := ""}}
 {{$error := "no"}}
@@ -39,6 +39,7 @@
 	{{$letters = ($game.Get "letters")}}
 	{{$score = ($game.Get "score")}}
 	{{$msg = $game.Get "embed"}}
+	{{$eMsg = $game.Get "eMsg"}}
 	{{$attempt = $game.Get "guess"}}
 	{{$add = $attempt}}
 	{{$expire = $game.Get "expires"}}
@@ -195,12 +196,12 @@
 		{{end}}
 
 	{{else}}
-		{{$desc = (joinStr "" "Sorry, your last Wordy game expired <t:" $expire ":R>. Use `-wordy` to start a new one!")}}
+		{{$desc = (joinStr "" "Sorry, your last Wordy game expired <t:" $expire ":R>. Use `.wordy` to start a new one!")}}
 		{{$error = "yes"}}
 		{{$color = 16711680}}{{/* Red */}}
 	{{end}}
 {{else}}
-	{{$desc = (joinStr "" "You have no active Wordy game. Use `-wordy` to start a new one!")}}
+	{{$desc = (joinStr "" "You have no active Wordy game. Use `.wordy` to start a new one!")}}
 	{{$error = "yes"}}
 	{{$delete = "yes"}}
 	{{$color = 16711680}}{{/* Red */}}
@@ -214,6 +215,7 @@
 	"color" $color
 	"footer" (sdict "text" (joinStr "" "This game belongs to: " .User.String) )
 	"thumbnail" (sdict "url" "http://www.yezsarkcluster.com/uploads/7/1/0/3/7103082/wordy_orig.jpg") }}
+{{deleteMessage nil $eMsg 1}}{{$eMsg = sendMessageRetID nil (complexMessage "content" .User.Mention "embed" $embed)}}
 {{else}}
 	{{$embed = cembed 
 	"title" "Wordy" 
@@ -227,11 +229,12 @@
 	(sdict "name" "Expires" "value" $expires "inline" false))
 	"footer" (sdict "text" (joinStr "" "This game belongs to: " .User.String) )
 	"thumbnail" (sdict "url" "http://www.yezsarkcluster.com/uploads/7/1/0/3/7103082/wordy_orig.jpg") }}
+{{deleteMessage nil $eMsg 1}}{{deleteMessage nil $msg 1}}{{$msg = sendMessageRetID nil (complexMessage "content" .User.Mention "embed" $embed)}}
 {{end}}
-{{deleteMessage nil $msg 10}}{{$msg = sendMessageRetID nil (complexMessage "content" .User.Mention "embed" $embed)}}
+
 
 {{if eq $delete "yes" }}
 	{{dbDel .User.ID "WORDY"}}
 {{else}}
-	{{$game.Set "letters" $letters}}{{$game.Set "embed" $msg}}{{$game.Set "guess" $add}}{{$game.Set "previous" $next}}{{$game.Set "score" $score}}{{dbSet .User.ID "WORDY" $game}}
+	{{$game.Set "letters" $letters}}{{$game.Set "embed" $msg}}{{$game.Set "guess" $add}}{{$game.Set "previous" $next}}{{$game.Set "score" $score}}{{$game.Set "eMsg" $eMsg}}{{dbSet .User.ID "WORDY" $game}}
 {{end}}
