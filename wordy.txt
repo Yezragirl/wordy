@@ -3,6 +3,8 @@
 {{$list = shuffle $list}}
 {{$word := ""}}
 {{$game := (dbGet .User.ID "WORDY").Value}}
+{{$p := exec "prefix"}}
+{{$prefix := slice $p (sub (len $p) 2) (sub (len $p) 1)}}
 {{$capitalletters := (sdict "A" ":regional_indicator_a:" "B" ":regional_indicator_b:" "C" ":regional_indicator_c:" "D" ":regional_indicator_d:" "E" ":regional_indicator_e:" "F" ":regional_indicator_f:" "G" ":regional_indicator_g:" "H" ":regional_indicator_h:" "I" ":regional_indicator_i:" "J" ":regional_indicator_j:" "K" ":regional_indicator_k:" "L" ":regional_indicator_l:" "M" ":regional_indicator_m:" "N" ":regional_indicator_n:" "O" ":regional_indicator_o:" "P" ":regional_indicator_p:" "Q" ":regional_indicator_q:" "R" ":regional_indicator_r:" "S" ":regional_indicator_s:" "T" ":regional_indicator_t:" "U" ":regional_indicator_u:" "V" ":regional_indicator_v:" "W" ":regional_indicator_w:" "X" ":regional_indicator_x:" "Y" ":regional_indicator_y:" "Z" ":regional_indicator_z:" )}}
 {{$lowerletters := (sdict "A" "<:a_:935648790227071020>" "B" "<:b_:935648790315159563>" "C" "<:c_:935648790524874812>" "D" "<:d_:935648790969454682>" "E" "<:e_:935648790097043517>" "F" "<:f_:935648790684250122>" "G" "<:g_:935648790491299960>" "H" "<:h_:935648790461956177>" "I" "<:i_:935648790529077258>" "J" "<:j_:935648790596178031>" "K" "<:k_:935648791313412166>" "L" "<:l_:935648791082725476>" "M" "<:m_:935648790554226728>" "N" "<:n_:935648790210301984>" "O" "<:o_:935648790642294792>" "P" "<:p_:935648790646521866>" "Q" "<:q_:935648790646505552>" "R" "<:r_:935648790675861544>" "S" "<:s_:935648790587801600>" "T" "<:t_:935648791040757780>" "U" "<:u_:935648790818480159>" "V" "<:v_:935648790709432371>" "W" "<:w_:935648790675861504>" "X" "<:x_:935648790185148479>" "Y" "<:y_:935648790659076146>" "Z" "<:z_:935648793678995476>" )}}
 {{dbSet 0 "CAPS" $capitalletters}}
@@ -14,7 +16,7 @@
         {{$expire := $game.Get "expires"}}
         {{$previous := $game.Get "previous"}}
         {{if le (toInt $expire) currentTime.Unix}}
-            {{$errormsg := (joinStr "" "Sorry, your last Wordy game expired <t:" $expire ":R>. Use `-wordy` to start a new one!")}}
+            {{$errormsg := (joinStr "" "Sorry, your last Wordy game expired <t:" $expire ":R>. Use `" $prefix "wordy` to start a new one!")}}
             {{$embed := cembed 
                 "title" "Wordy" 
                 "description" $errormsg
@@ -24,7 +26,7 @@
                 {{$msg = sendMessageRetID nil (complexMessage "content" .User.Mention "embed" $embed)}}
             {{dbDel .User.ID "WORDY"}}
         {{else}}
-            {{$errormsg := "There is already a puzzle in progress. Use `-guess <word>` to progress it."}}
+            {{$errormsg := "There is already a puzzle in progress. Use `" $prefix "guess <word>` to progress it."}}
             {{$embed := cembed 
             "title" "Wordy" 
             "description" $errormsg
@@ -46,7 +48,7 @@
         "description" "Welcome to Wordy!\n\nYour Word has been Set. You have 6 guesses and 30 minutes to solve it." 
         "color" 16711680
         "fields" (cslice 
-        (sdict "name" "Instructions" "value" "Try to figure out the 5-letter word with the command `-guess [word]`. Letters in the correct positions will be 🇧‎🇱‎🇺‎🇪 in the response. Letters in the word but in the wrong position will be\n<:y_:935648790659076146>​<:e_:935648790097043517>​<:l_:935648791082725476>​<:l_:935648791082725476>​<:o_:935648790642294792>​<:w_:935648790675861504>." "inline" false)
+        (sdict "name" "Instructions" "value" "Try to figure out the 5-letter word with the command `" $prefix "guess [word]`. Letters in the correct positions will be 🇧‎🇱‎🇺‎🇪 in the response. Letters in the word but in the wrong position will be\n<:y_:935648790659076146>‎<:e_:935648790097043517>‎<:l_:935648791082725476>‎<:l_:935648791082725476>‎<:o_:935648790642294792>‎<:w_:935648790675861504>." "inline" false)
         (sdict "name" "Scoring" "value" "-500 for each unsolved letter\n1000 for each letter thats in the wrong position\n10000 for every solved letter\n\n*If you win before the last round, you get the points for 5 solved letters for each remaining round*" "inline" false)
         (sdict "name" "Expires" "value" (joinStr "" "This game expires <t:" $expire ":R>") "inline" false))
         "footer" (sdict "text" (joinStr "" "This game belongs to: " .User.String) )
