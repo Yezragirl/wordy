@@ -46,7 +46,7 @@
         "description" "Welcome to Wordy!\n\nYour Word has been Set. You have 6 guesses and 30 minutes to solve it." 
         "color" 16711680
         "fields" (cslice 
-        (sdict "name" "Instructions" "value" "Try to figure out the 5-letter word with the command `-guess [word]`. Letters in the correct positions will be 🇧​🇱​🇺​🇪 in the response. Letters in the word but in the wrong position will be\n<:y_:935648790659076146>​<:e_:935648790097043517>​<:l_:935648791082725476>​<:l_:935648791082725476>​<:o_:935648790642294792>​<:w_:935648790675861504>." "inline" false)
+        (sdict "name" "Instructions" "value" "Try to figure out the 5-letter word with the command `-guess [word]`. Letters in the correct positions will be 🇧‎🇱‎🇺‎🇪 in the response. Letters in the word but in the wrong position will be\n<:y_:935648790659076146>​<:e_:935648790097043517>​<:l_:935648791082725476>​<:l_:935648791082725476>​<:o_:935648790642294792>​<:w_:935648790675861504>." "inline" false)
         (sdict "name" "Scoring" "value" "-500 for each unsolved letter\n1000 for each letter thats in the wrong position\n10000 for every solved letter\n\n*If you win before the last round, you get the points for 5 solved letters for each remaining round*" "inline" false)
         (sdict "name" "Expires" "value" (joinStr "" "This game expires <t:" $expire ":R>") "inline" false))
         "footer" (sdict "text" (joinStr "" "This game belongs to: " .User.String) )
